@@ -1,2 +1,0 @@
-# michaelsCabin
-Michael's Cabin
