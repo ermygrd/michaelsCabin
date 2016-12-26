@@ -21,17 +21,39 @@ class Comments extends Component {
 }
 
 class CommentBox extends Component {
+  constructor(){
+    super();
+    this.state={
+      showComments: false
+    };
+  }
+
   render() {
     const commentArray=this._getComments();
+    let commentNodes;
+    { /* now being displayed based on components state */}
+    if (this.state.showComments){
+      commentNodes=<div className="comment-list">{commentArray}</div>
+    }
+    let buttonText='Show Comments';
+    if (this.state.showComments){
+      buttonText='Hide Comments';
+    }
+
     return (
       <div className="comment-box">
-        <h3>Comments</h3>
-        <h4 className="comment-count">Comments number goes here</h4>
-        <div className="comment-list">
-          {commentArray}
-        </div>
+        <h3>Comments Section</h3>
+        <h4 className="comment-count">{this._getCommentsTitle(commentArray.length)} </h4>
+        <button onClick={this._handleClick.bind(this)}>Show Comments</button>
+        {commentNodes}
       </div>
     );
+  }
+
+  _handleClick(){
+    this.setState({
+      showComments: !this.state.showComments
+    })
   }
 
   _getComments(){
@@ -62,14 +84,14 @@ class App extends Component {
     render() {
 
         const now=new Date();
-        const listOfThings=['thing1', 'thing2', 'thingOther']
+        const listOfThings=['First item of the list\: I am a magician', 'Other item on the list\: I am the master of the universe', 'Last item of the list\: everybody come see how good I am']
         return (
           <div className="App" >
               <div className="App-header" >
               <img src={logo}
                 className="App-logo"
                 alt="logo" / >
-              <h2 > Michael's Cabin < /h2>
+              <h2 > Michael's React Cabin < /h2>
               < / div >
               <p className="App-intro" > Look at what I made. It is a cabin to put react stuff. </p>
               <p> Current time: { now.toTimeString() }  < /p>
@@ -79,9 +101,7 @@ class App extends Component {
              </ul>
 
              { /* Pass in static comments */}
-             <Comments author="Kim Todd" body="I made this comment. Just now."/>
-             <Comments author="Also Kim Todd" body="Yes, I also made this comment. I am a great writer. Atom needs spell check fo rme." />
-
+             <Comments author="Kim Todd" body="I made this comment. Just now. But it is static."/>
              { /* Passing over dynamic comments */}
              <CommentBox />
 
