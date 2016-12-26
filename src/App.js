@@ -9,22 +9,16 @@ import {
 } from 'react-bootstrap';
 import './App.css';
 
-class Comments extends Component {
-  render () {
-    return (
-      <div className="comment">
-        <p className="comment-header">{this.props.author}</p>
-        <p className="comment-body">{this.props.body}</p>
-      </div>
-    );
-  }
-}
-
 class CommentBox extends Component {
   constructor(){
     super();
     this.state={
-      showComments: false
+      showComments: false,
+      comments: [
+        { id: 1, author:'Annabelle Anaya', body:"Great stuff. Can't wait to work with you."},
+        { id: 2, author:'Chris Borabe', body:"Very impressive."},
+        { id: 3, author:'Tom Jones', body:"Please take me under your tutelage."}
+      ]
     };
   }
 
@@ -42,12 +36,25 @@ class CommentBox extends Component {
 
     return (
       <div className="comment-box">
+        <div className="comment-box">
+          <CommentForm addComment={this._addComment.bind(this)}/>
+        </div>
         <h3>Comments Section</h3>
         <h4 className="comment-count">{this._getCommentsTitle(commentArray.length)} </h4>
         <button onClick={this._handleClick.bind(this)}>Show Comments</button>
         {commentNodes}
       </div>
     );
+  }
+
+  _addComment(author, body){
+    { /* creating a new comment object */}
+    const comment={
+    id: this.state.comments.length + 1,
+    author,
+    body
+    }
+    this.setState({comments:this.state.comments.concat([comment])});
   }
 
   _handleClick(){
@@ -57,14 +64,8 @@ class CommentBox extends Component {
   }
 
   _getComments(){
-    { /* dynamic array should go here eventually */}
-    const commentList = [
-      { id: 1, author:'Annabelle Anaya', body:"Great stuff. Can't wait to work with you."},
-      { id: 2, author:'Chris Borabe', body:"Very impressive."},
-      { id: 3, author:'Tom Jones', body:"Please take me under your tutelage."}
-    ];
-
-    return commentList.map((item) => {
+    { /* dynamic array should go here eventually, just removed commentsList to put in state constructor */}
+    return this.state.comments.map((item) => {
       return(
         <Comments author={item.author} body={item.body} key={item.id} />
       );
@@ -77,6 +78,46 @@ class CommentBox extends Component {
     } else if (commentCount === 1){
       return '1 Comment'
     } else return `${commentCount} Comments`;
+  }
+}
+
+class CommentForm extends Component {
+  render() {
+    return (
+      <form className="comment-form" onSubmit={this._handleSubmit.bind(this)}>
+        <label> Got something to say?</label>
+          <div className="comment-form-fields">
+            <input placeholder="Name:" ref={(input) => this._author=input} />
+          <textarea placeholder="Comment:" ref={(textarea) => this._body=textarea}></textarea>
+          </div>
+          <div className="comment-form-actions">
+            <button type="submit">
+              Post Comment
+            </button>
+          </div>
+      </form>
+    );
+  }
+
+
+  _handleSubmit(event){
+    event.preventDefault();
+
+    let author=this._author;
+    let body=this._body;
+
+    this.props.addComment(author.value, body.value);
+  }
+}
+
+class Comments extends Component {
+  render () {
+    return (
+      <div className="comment">
+        <p className="comment-header">{this.props.author}</p>
+        <p className="comment-body">{this.props.body}</p>
+      </div>
+    );
   }
 }
 
