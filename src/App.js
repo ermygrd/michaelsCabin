@@ -82,14 +82,24 @@ class CommentBox extends Component {
 }
 
 class CommentForm extends Component {
+  constructor(){
+    super();
+    this.state={
+      characters: 0
+    }
+  }
+
   render() {
     return (
       <form className="comment-form" onSubmit={this._handleSubmit.bind(this)}>
         <label> Got something to say?</label>
           <div className="comment-form-fields">
             <input placeholder="Name:" ref={(input) => this._author=input} />
-          <textarea placeholder="Comment:" ref={(textarea) => this._body=textarea}></textarea>
+          <textarea placeholder="Comment:" ref={(textarea) => this._body=textarea}
+            onKeyUp={this._getCharacterCount.bind(this)}
+            ></textarea>
           </div>
+          <p>{this.state.characters} characters</p>
           <div className="comment-form-actions">
             <button type="submit">
               Post Comment
@@ -102,12 +112,25 @@ class CommentForm extends Component {
 
   _handleSubmit(event){
     event.preventDefault();
+    if (!this._author.value || !this._body.value) {
+         alert("Please enter your name and comment");
+         return
+       }
 
     let author=this._author;
     let body=this._body;
 
     this.props.addComment(author.value, body.value);
+
+    this._author.value = '';
+    this._body.value = '';
+    this.setState({ characters: 0 });
   }
+
+  _getCharacterCount(){
+    this.setState({characters: this._body.value.length});
+  }
+
 }
 
 class Comments extends Component {
@@ -125,7 +148,7 @@ class App extends Component {
     render() {
 
         const now=new Date();
-        const listOfThings=['First item of the list\: I am a magician', 'Other item on the list\: I am the master of the universe', 'Last item of the list\: everybody come see how good I am']
+        const listOfThings=['First item of the list: I am a magician', 'Other item on the list: I am the master of the universe', 'Last item of the list: everybody come see how good I am']
         return (
           <div className="App" >
               <div className="App-header" >
