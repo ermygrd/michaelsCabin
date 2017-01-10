@@ -8,6 +8,8 @@ import {
     Button
 } from 'react-bootstrap';
 import './App.css';
+import $ from 'jquery';
+
 
 class CommentBox extends Component {
   constructor(){
@@ -20,6 +22,21 @@ class CommentBox extends Component {
         { id: 3, author:'Tom Jones', body:"Please take me under your tutelage."}
       ]
     };
+  }
+
+  componentWillMount() {
+    { /* Called before the component is rendered */}
+    this._fetchComments();
+  }
+
+  componentDidMount(){
+    { /* Called after the component is rendered */}
+    this._timer = setInterval(() => this._fetchComments(), 5000);
+  }
+
+  componentWillUnmount(){
+    { /* Called when component is being removed from dom */}
+    clearInterval(this._timer);
   }
 
   render() {
@@ -49,12 +66,30 @@ class CommentBox extends Component {
 
   _addComment(author, body){
     { /* creating a new comment object */}
-    const comment={
-    id: this.state.comments.length + 1,
-    author,
-    body
-    }
-    this.setState({comments:this.state.comments.concat([comment])});
+    const comment={author, body}
+
+    $.post('/api/comments', {comment})
+    .success(newComment => {
+      this.setState({ comments: this.state.comments.concat([newComment]) });
+    });
+
+    // const comment={
+    // id: this.state.comments.length + 1,
+    // author,
+    // body
+    // }
+    // this.setState({comments:this.state.comments.concat([comment])});
+  }
+
+  _deleteComment(comment){
+    $.ajax({
+      method: 'DELETE',
+      url: `/api/comments/${comment.id}`
+    })
+    const comments=[...this.state.comments];
+    const commentIndex=comment.indexOf(comment);
+    comments.splice(commentIndex, 1);
+    this.setState({comments});
   }
 
   _handleClick(){
@@ -67,7 +102,11 @@ class CommentBox extends Component {
     { /* dynamic array should go here eventually, just removed commentsList to put in state constructor */}
     return this.state.comments.map((item) => {
       return(
-        <Comments author={item.author} body={item.body} key={item.id} />
+        <Comments
+          author={item.author}
+          body={item.body}
+          key={item.id}
+          onDelete={this._deleteComment.bind(this)}/>
       );
     });
   }
@@ -78,6 +117,16 @@ class CommentBox extends Component {
     } else if (commentCount === 1){
       return '1 Comment'
     } else return `${commentCount} Comments`;
+  }
+
+  _fetchComments(){
+    $.ajax ({
+      method: 'GET',
+      url: '/api/comments',
+      success: (comments) => {
+        this.setState({comments})
+      }
+    });
   }
 }
 
@@ -139,8 +188,16 @@ class Comments extends Component {
       <div className="comment">
         <p className="comment-header">{this.props.author}</p>
         <p className="comment-body">{this.props.body}</p>
+      <a href="#" onClick={this._handleDelete.bind(this)}>Delete Comment</a>
       </div>
     );
+  }
+
+  _handleDelete(event){
+    event.preventDefault();
+    if (confirm('Are you sure?')){
+      this.props.onDelete(this.props.comment);
+    }
   }
 }
 
