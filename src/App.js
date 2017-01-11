@@ -10,6 +10,33 @@ import {
 import './App.css';
 import $ from 'jquery';
 
+class BlogEntry extends Component {
+  constructor(){
+    super();
+    this.state={
+      entries: [
+        { id: 1, title:'Practice with React', body:'Another technical interview done and it is time to practice. This one felt much better and I got to meet a few different people one-on-one as well as worked on a little bit of code in a more collaborative sense. A few hour interview still can not be considered anything but stressful, but as far as interviews go, I had fun and loved the company and people I met.'},
+        { id: 2, title:'First Technical Interview', body:'Today I had my first technical interview. I was asked to do something so simple, I literally had already done it for the code challenge to get the interview, I panicked. They helped me. It was not that bad. I celebrated my first techinical interview with blueberry coffee cake and a cappuccino.'},
+        { id: 3, title:'Grace Hopper, I never knew what you would mean to me.', body:'I was fortunate enough to be selected to attend the Grace Hopper Celebration of Women in Computing Conference by my Professors at SBCC. I had never been to a conference of this size - 15,000 people. And I wasn’t sure exactly what to hope for from the conference other than an internship or entry level job.'}
+      ]
+    };
+  }
+  render() {
+    const entryArray=this.state.entries.map( (item) => {
+      return(
+        <div className="entry" key={item.id}>
+          <p className="entry-header">{item.title}</p>
+          <p className="entry-body">{item.body}</p>
+        </div>
+      )
+    });
+    return (
+      <div className="blog-box">
+        {entryArray}
+      </div>
+    );
+  }
+}
 
 class CommentBox extends Component {
   constructor(){
@@ -39,13 +66,78 @@ class CommentBox extends Component {
     clearInterval(this._timer);
   }
 
+
+    _addComment(author, body){
+      { /* creating a new comment object */}
+      const comment={author, body}
+
+      $.post('/api/comments', {comment})
+      .success(newComment => {
+        this.setState({ comments: this.state.comments.concat([newComment]) });
+      });
+
+      // const comment={
+      // id: this.state.comments.length + 1,
+      // author,
+      // body
+      // }
+      // this.setState({comments:this.state.comments.concat([comment])});
+    }
+
+    _deleteComment(comment){
+      $.ajax({
+        method: 'DELETE',
+        url: `/api/comments/${comment.id}`
+      })
+      const comments=[...this.state.comments];
+      const commentIndex=comment.indexOf(comment);
+      comments.splice(commentIndex, 1);
+      this.setState({comments});
+    }
+
+    _handleClick(){
+      this.setState({
+        showComments: !this.state.showComments
+      })
+    }
+
+    _getCommentsTitle(commentCount){
+      if (commentCount === 0){
+        return 'No Comments Yet'
+      } else if (commentCount === 1){
+        return '1 Comment'
+      } else return `${commentCount} Comments`;
+    }
+
+    _fetchComments(){
+      $.ajax ({
+        method: 'GET',
+        url: '/api/comments',
+        success: (comments) => {
+          this.setState({comments})
+        }
+      });
+    }
+
   render() {
-    const commentArray=this._getComments();
+
+    const commentArray=this.state.comments.map( (item) => {
+      return(
+        <Comments
+          author={item.author}
+          body={item.body}
+          key={item.id}
+          onDelete={this._deleteComment.bind(this)}
+        />
+      )
+    });
+
     let commentNodes;
-    { /* now being displayed based on components state */}
+    { /* comments displayed based on components state */}
     if (this.state.showComments){
       commentNodes=<div className="comment-list">{commentArray}</div>
     }
+
     let buttonText='Show Comments';
     if (this.state.showComments){
       buttonText='Hide Comments';
@@ -56,7 +148,6 @@ class CommentBox extends Component {
         <div className="comment-box">
           <CommentForm addComment={this._addComment.bind(this)}/>
         </div>
-        <h3>Comments Section</h3>
         <h4 className="comment-count">{this._getCommentsTitle(commentArray.length)} </h4>
         <button onClick={this._handleClick.bind(this)}>Show Comments</button>
         {commentNodes}
@@ -64,70 +155,6 @@ class CommentBox extends Component {
     );
   }
 
-  _addComment(author, body){
-    { /* creating a new comment object */}
-    const comment={author, body}
-
-    $.post('/api/comments', {comment})
-    .success(newComment => {
-      this.setState({ comments: this.state.comments.concat([newComment]) });
-    });
-
-    // const comment={
-    // id: this.state.comments.length + 1,
-    // author,
-    // body
-    // }
-    // this.setState({comments:this.state.comments.concat([comment])});
-  }
-
-  _deleteComment(comment){
-    $.ajax({
-      method: 'DELETE',
-      url: `/api/comments/${comment.id}`
-    })
-    const comments=[...this.state.comments];
-    const commentIndex=comment.indexOf(comment);
-    comments.splice(commentIndex, 1);
-    this.setState({comments});
-  }
-
-  _handleClick(){
-    this.setState({
-      showComments: !this.state.showComments
-    })
-  }
-
-  _getComments(){
-    { /* dynamic array should go here eventually, just removed commentsList to put in state constructor */}
-    return this.state.comments.map((item) => {
-      return(
-        <Comments
-          author={item.author}
-          body={item.body}
-          key={item.id}
-          onDelete={this._deleteComment.bind(this)}/>
-      );
-    });
-  }
-
-  _getCommentsTitle(commentCount){
-    if (commentCount === 0){
-      return 'No Comments Yet'
-    } else if (commentCount === 1){
-      return '1 Comment'
-    } else return `${commentCount} Comments`;
-  }
-
-  _fetchComments(){
-    $.ajax ({
-      method: 'GET',
-      url: '/api/comments',
-      success: (comments) => {
-        this.setState({comments})
-      }
-    });
-  }
 }
 
 class CommentForm extends Component {
@@ -204,28 +231,19 @@ class Comments extends Component {
 class App extends Component {
     render() {
 
-        const now=new Date();
-        const listOfThings=['First item of the list: I am a magician', 'Other item on the list: I am the master of the universe', 'Last item of the list: everybody come see how good I am']
         return (
           <div className="App" >
-              <div className="App-header" >
-              <img src={logo}
-                className="App-logo"
-                alt="logo" / >
-              <h2 > Michael's React Cabin < /h2>
+              <div className="App-header major" >
+              <h2 > Kim's React Blog < /h2>
               < / div >
-              <p className="App-intro" > Look at what I made. It is a cabin to put react stuff. </p>
-              <p> Current time: { now.toTimeString() }  < /p>
-              <ul>
-              { /* curly braces intrepreted direclty as js which is why these comments work */}
-                {listOfThings.map( thing => <li>{thing}</li>)}
-             </ul>
+              <p className="App-intro" > A place for further examination of my projects and thoughts and such. Organized chronologically.</p>
 
              { /* Pass in static comments */}
-             <Comments author="Kim Todd" body="I made this comment. Just now. But it is static."/>
+             <Comments author="Kim Todd" body="I made this comment. Just now. But it is static. It is an example that is hard coded."/>
              { /* Passing over dynamic comments */}
+             <BlogEntry />
+             <p> This is the comment box below </p>
              <CommentBox />
-
          </div>
         );
     }
