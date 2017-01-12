@@ -1,0 +1,16 @@
+[{
+        "id": 1,
+        "title": "Practice with React",
+        "body": "Another technical interview done and it is time to practice. This one felt much better and I got to meet a few different people one-on-one as well as worked on a little bit of code in a more collaborative sense. A few hour interview still can not be considered anything but stressful, but as far as interviews go, I had fun and loved the company and people I met."
+    },
+    {
+        "id": 2,
+        "title": "First Technical Interview",
+        "body": "Today I had my first technical interview. I was asked to do something so simple, I literally had already done it for the code challenge to get the interview, I panicked. They helped me. It was not that bad. I celebrated my first techinical interview with blueberry coffee cake and a cappuccino."
+    },
+    {
+        "id": 3,
+        "title": "Grace Hopper, I never knew what you would mean to me.",
+        "body": "I was fortunate enough to be selected to attend the Grace Hopper Celebration of Women in Computing Conference by my Professors at SBCC. I had never been to a conference of this size - 15,000 people. And I wasn’t sure exactly what to hope for from the conference other than an internship or entry level job."
+    }
+]

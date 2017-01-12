@@ -1,0 +1,16 @@
+[{
+        "id": 1,
+        "author": "Comments from the public folder",
+        "body": "This will obvy change."
+    },
+    {
+        "id": 2,
+        "author": "Chris Borabe",
+        "body": "Very impressive."
+    },
+    {
+        "id": 3,
+        "author": "Tom Jones",
+        "body": "Please take me under your tutelage."
+    }
+]
